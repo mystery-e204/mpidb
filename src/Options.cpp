@@ -28,7 +28,7 @@ const std::string Options::helpString_base =
     "\t\t\tExample: 2-5,9,7 specifies ranks 2, 3, 4, 5, 7 and 9\n"
     " -g, --gdbserver=FILE\tPath to the gdbserver executable, default=gdbserver\n";
 
-const char * envVarRankChoices[][2] = {
+const char * envVarRankTuples[][2] = {
     { "OMPI_COMM_WORLD_SIZE", "OMPI_COMM_WORLD_RANK" },
     { "PMI_SIZE", "PMI_RANK" },
     { "SLURM_NTASKS", "SLURM_PROCID" }
@@ -36,7 +36,7 @@ const char * envVarRankChoices[][2] = {
 
 void getMPIInfo(int & numRanks, int & rank)
 {
-    for (auto tuple : envVarRankChoices)
+    for (auto tuple : envVarRankTuples)
     {
         auto numRanksPtr = getenv(tuple[0]);
         auto rankPtr = getenv(tuple[1]);
@@ -60,6 +60,8 @@ void getMPIInfo(int & numRanks, int & rank)
             throw EnvException("MPI rank is negative: " + std::string(rankPtr));
         if (rank >= numRanks)
             throw EnvException("MPI rank is too large: " + std::string(rankPtr) + ", " + std::string(numRanksPtr));
+
+        return;
     }
 
     throw EnvException("Could not find MPI rank and size");
