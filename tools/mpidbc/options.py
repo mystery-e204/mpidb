@@ -34,7 +34,7 @@ class Options:
         parser.add_argument("format", choices=self._formatters.keys(),
             help="format of the configuration file")
         parser.add_argument("file",
-            help="path of the configuration file")
+            help="configuration is written to this file")
         parser.add_argument("-n", "--name", default="debug",
             help="name of the debug configuration")
 
