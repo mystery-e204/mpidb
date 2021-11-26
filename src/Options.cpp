@@ -28,37 +28,41 @@ const std::string Options::helpString_base =
     "\t\t\tExample: 2-5,9,7 specifies ranks 2, 3, 4, 5, 7 and 9\n"
     " -g, --gdbserver=FILE\tPath to the gdbserver executable, default=gdbserver\n";
 
+const char * envVarRankChoices[][2] = {
+    { "OMPI_COMM_WORLD_SIZE", "OMPI_COMM_WORLD_RANK" },
+    { "PMI_SIZE", "PMI_RANK" },
+    { "SLURM_NTASKS", "SLURM_PROCID" }
+};
 
 void getMPIInfo(int & numRanks, int & rank)
 {
-    auto numRanksPtr = getenv("OMPI_COMM_WORLD_SIZE");
-    auto rankPtr = getenv("OMPI_COMM_WORLD_RANK");
-
-    if (numRanksPtr == nullptr || rankPtr == nullptr)
+    for (auto tuple : envVarRankChoices)
     {
-        numRanksPtr = getenv("PMI_SIZE");
-        rankPtr = getenv("PMI_RANK");
+        auto numRanksPtr = getenv(tuple[0]);
+        auto rankPtr = getenv(tuple[1]);
 
         if (numRanksPtr == nullptr || rankPtr == nullptr)
-            throw EnvException("Could not find MPI rank and size");
+            continue;
+
+        try
+        {
+            numRanks = std::stoi(numRanksPtr);
+            rank = std::stoi(rankPtr);
+        }
+        catch (std::invalid_argument & e)
+        {
+            throw EnvException("MPI rank or size could not be interpreted as int: " + std::string(numRanksPtr) + ", " + std::string(rankPtr));
+        }
+
+        if (numRanks <= 0)
+            throw EnvException("MPI size is negative: " + std::string(numRanksPtr));
+        if (rank < 0)
+            throw EnvException("MPI rank is negative: " + std::string(rankPtr));
+        if (rank >= numRanks)
+            throw EnvException("MPI rank is too large: " + std::string(rankPtr) + ", " + std::string(numRanksPtr));
     }
 
-    try
-    {
-        numRanks = std::stoi(numRanksPtr);
-        rank = std::stoi(rankPtr);
-    }
-    catch (std::invalid_argument & e)
-    {
-        throw EnvException("MPI rank or size could not be interpreted as int: " + std::string(numRanksPtr) + ", " + std::string(rankPtr));
-    }
-
-    if (numRanks <= 0)
-        throw EnvException("MPI size is negative: " + std::string(numRanksPtr));
-    if (rank < 0)
-        throw EnvException("MPI rank is negative: " + std::string(rankPtr));
-    if (rank >= numRanks)
-        throw EnvException("MPI rank is too large: " + std::string(rankPtr) + ", " + std::string(numRanksPtr));
+    throw EnvException("Could not find MPI rank and size");
 }
 
 
