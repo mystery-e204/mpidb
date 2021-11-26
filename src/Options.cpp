@@ -11,12 +11,13 @@
 // _test_mani update name of configuration generator
 
 const std::string Options::helpString_base =
-    "Usage: MPIRUN [MPIOPT]... -- mpidb [OPTION]... [--] APP [APPOPT]...\n"
+    "Usage: MPIRUN [MPIOPT]... [--] mpidb [OPTION]... [--] APP [APPOPT]...\n"
     "Debug multiple processes of MPI application APP.  For each MPI rank, an\n"
     "individual instance of gdbserver is spawned.\n\n"
-    " MPIRUN is the MPI scheduler (mpirun, mpiexec, ...) and MPIOPT are its\n"
+    " MPIRUN is the MPI scheduler (mpirun, mpiexec, srun, ...) and MPIOPT are its\n"
     "   options and arguments.\n"
     " APP is the MPI executable and APPOPT are its options and arguments.\n"
+    " -- might be required to separate arguments depending on the MPI scheduler.\n"
     " Information regarding the gdbserver instances is written to the standard\n"
     " output. It can be piped to mpidbc.py to generate configuration files.\n\n"
     "Options\n"
