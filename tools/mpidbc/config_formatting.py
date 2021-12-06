@@ -80,10 +80,20 @@ class ConfigFormatter_VSCode(ConfigFormatter_Base):
         "MIMode": "gdb",
         "setupCommands": [
             {
-                "description": "Enable pretty-printing for gdb",
                 "text": "-enable-pretty-printing",
                 "ignoreFailures": True
-            }
+            },
+            {
+                "text": None,
+            },
+            {
+                "text": "break _gfortran_runtime_error_at",
+                "ignoreFailures": True
+            },
+            {
+                "text": "break _Unwind_Backtrace",
+                "ignoreFailures": True
+            },
         ]
     }
 
@@ -108,6 +118,7 @@ class ConfigFormatter_VSCode(ConfigFormatter_Base):
             cur_config["name"] = config_name
             cur_config["program"] = self._app_name
             cur_config["miDebuggerServerAddress"] = info.host + ":" + str(info.port)
+            cur_config["setupCommands"][1]["text"] = f"file {self._app_name}"
 
             config_base["configurations"].append(cur_config)
             compound_config_names.append(config_name)
