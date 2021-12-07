@@ -1,6 +1,13 @@
 from config_formatting import ConfigFormatter_Base
-from argparse import ArgumentParser, FileType, RawDescriptionHelpFormatter
+from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import textwrap
+from pathlib import Path
+
+def dir_path(path):
+    if Path(path).is_dir():
+        return str(Path(path).resolve())
+    else:
+        raise ArgumentTypeError(f"{path} is not a valid directory")
 
 def _get_all_subclasses(cls):
     return set(cls.__subclasses__()).union(
@@ -21,6 +28,10 @@ class Options:
     def config_name(self):
         return self._args.name
 
+    @property
+    def source_dir(self):
+        return self._args.sdir
+
     def __init__(self):
         self._formatters = { cls.get_option_name(): cls for cls in _get_all_subclasses(ConfigFormatter_Base) }
 
@@ -37,6 +48,8 @@ class Options:
             help="configuration is written to this file")
         parser.add_argument("-n", "--name", default="debug",
             help="name of the debug configuration")
+        parser.add_argument("-s", "--sdir", type=dir_path,
+            help="source-file directory")
 
         self._args = parser.parse_args()
 

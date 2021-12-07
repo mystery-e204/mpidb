@@ -21,7 +21,7 @@ def construct_formatter(options):
         if rank == 0 and formatter == None:
             appName = words[1]
             numDebugRanks = int(words[2])
-            formatter = options.formatter(options.config_name, appName)
+            formatter = options.formatter(options.config_name, appName, options.source_dir)
 
             for t in info_buffer:
                 formatter.add_rank_info(*t)

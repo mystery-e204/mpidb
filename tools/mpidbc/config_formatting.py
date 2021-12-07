@@ -9,9 +9,10 @@ class ConfigFormatter_Base(ABC):
     _OPTION_NAME = None
     _OPTION_HELP = None
 
-    def __init__(self, config_name, app_name):
+    def __init__(self, config_name, app_name, source_dir=None):
         self._config_name = config_name
         self._app_name = app_name
+        self._source_dir = source_dir
         self._rank_info = []
 
     def add_rank_info(self, rank, hostName, port):
@@ -39,7 +40,9 @@ class ConfigFormatter_PlainText(ConfigFormatter_Base):
     _OPTION_HELP = "Simple human-readable plain-text format."
 
     def write_config(self, file):
-        file.write(f"{self._config_name}\n{self._app_name}\n")
+        file.write(f"config_name={self._config_name}\n")
+        file.write(f"app_name={self._app_name}\n")
+        file.write(f"source_dir={self._source_dir if self._source_dir is not None else ''}\n")
 
         width_rank = max(map(len, ("Rank", *(str(info.rank) for info in self._rank_info)))) + 2
         width_host = max(map(len, ("Hostname", *(str(info.host) for info in self._rank_info)))) + 2
@@ -76,6 +79,7 @@ class ConfigFormatter_VSCode(ConfigFormatter_Base):
         "stopAtEntry": False,
         "cwd": "${workspaceRoot}",
         "environment": [],
+        "directory": None,
         "externalConsole": True,
         "MIMode": "gdb",
         "setupCommands": [
@@ -118,6 +122,7 @@ class ConfigFormatter_VSCode(ConfigFormatter_Base):
             cur_config["name"] = config_name
             cur_config["program"] = self._app_name
             cur_config["miDebuggerServerAddress"] = info.host + ":" + str(info.port)
+            cur_config["directory"] = self._source_dir
             cur_config["setupCommands"][1]["text"] = f"file {self._app_name}"
 
             config_base["configurations"].append(cur_config)
