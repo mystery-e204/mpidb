@@ -79,7 +79,6 @@ class ConfigFormatter_VSCode(ConfigFormatter_Base):
         "stopAtEntry": False,
         "cwd": "${workspaceRoot}",
         "environment": [],
-        "directory": None,
         "externalConsole": True,
         "MIMode": "gdb",
         "setupCommands": [
@@ -122,8 +121,13 @@ class ConfigFormatter_VSCode(ConfigFormatter_Base):
             cur_config["name"] = config_name
             cur_config["program"] = self._app_name
             cur_config["miDebuggerServerAddress"] = info.host + ":" + str(info.port)
-            cur_config["directory"] = self._source_dir
             cur_config["setupCommands"][1]["text"] = f"file {self._app_name}"
+
+            if self._source_dir is not None:
+                cur_config["setupCommands"].append({
+                    "text": f"directory {self._source_dir}",
+                    "ignoreFailures": True
+                })
 
             config_base["configurations"].append(cur_config)
             compound_config_names.append(config_name)
