@@ -1,4 +1,4 @@
-from config_formatting import ConfigFormatter_Base
+from mpidbc_deps.config_formatting import ConfigFormatter_Base
 from argparse import ArgumentParser, RawDescriptionHelpFormatter, ArgumentTypeError
 import textwrap
 from pathlib import Path
