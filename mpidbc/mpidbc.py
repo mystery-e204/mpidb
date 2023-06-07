@@ -2,7 +2,7 @@
 
 import sys
 import signal
-from options import Options
+from mpidbc_deps.options import Options
 
 def construct_formatter(options):
     numDebugRanks = -1
