@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include <exception>
+#include <numeric>
 
 #include <limits.h>
 #include <unistd.h>
@@ -190,12 +191,7 @@ void Options::SetDebugRanks(const std::string & argument)
             if (rank < 0 || rank >= numRanks)
                 throw std::out_of_range("Rank out of range: " + std::to_string(rank));
 
-            if (! rankBuffer[rank])
-            {
-                rankBuffer[rank] = true;
-                debugThisRank = rank == thisRank;
-                ++numDebugRanks;
-            }
+            rankBuffer[rank] = true;
         }
         else
         {
@@ -210,16 +206,11 @@ void Options::SetDebugRanks(const std::string & argument)
                 throw std::out_of_range("Rank out of range: " + std::to_string(endRank));
 
             for (int rank = startRank; rank <= endRank; ++rank)
-            {
-                if (! rankBuffer[rank])
-                {
-                    rankBuffer[rank] = true;
-                    debugThisRank = rank == thisRank;
-                    ++numDebugRanks;
-                }
-            }
+                rankBuffer[rank] = true;
         }
     }
+    debugThisRank = rankBuffer[thisRank];
+    numDebugRanks = std::accumulate(rankBuffer.begin(), rankBuffer.end(), 0);
 }
 
 Options::Option Options::ParseOption(const std::string & word)
